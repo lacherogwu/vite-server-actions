@@ -1,0 +1,32 @@
+{
+	"name": "vite-server-actions",
+	"version": "0.0.0",
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"exports": {
+		".": "./dist/main.js",
+		"./types": "./dist/types.d.ts"
+	},
+	"scripts": {
+		"build": "rm -rf dist && tsup",
+		"build:watch": "rm -rf dist && tsup --watch",
+		"release": "npm run build && npm publish"
+	},
+	"peerDependencies": {
+		"vite": "^6.0.11"
+	},
+	"devDependencies": {
+		"@types/node": "^22.13.0",
+		"tsup": "^8.3.6",
+		"typescript": "~5.7.3",
+		"vite": "^6.0.11"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"dependencies": {
+		"esbuild": "^0.24.2"
+	}
+}
