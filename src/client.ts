@@ -1,5 +1,2 @@
-export function defineAction() {
-	console.log('defineAction');
-
-	return {};
-}
+export * from './client/action';
+export * from './client/Error';

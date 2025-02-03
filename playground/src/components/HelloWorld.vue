@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { actions } from 'vite:actions';
 
+actions.user.list.handler();
 // actions.listUsers
 // console.log(actions.user.list);
 // console.log(actions.abiozpp);
