@@ -6,3 +6,5 @@ export const list = defineAction({
 		// code
 	},
 });
+
+export const create = defineAction({});

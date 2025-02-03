@@ -3,9 +3,9 @@ import { ref } from 'vue';
 import { actions } from 'vite:actions';
 
 // actions.listUsers
-console.log(actions.user.list);
-console.log(actions.abiozpp);
-console.log(actions.orders.list);
+// console.log(actions.user.list);
+// console.log(actions.abiozpp);
+// console.log(actions.orders.list);
 defineProps<{ msg: string }>();
 
 const count = ref(0);

@@ -1,5 +1,5 @@
 import type { Plugin } from 'vite';
-import { compileActionsFile, writeModuleDTS } from './utils';
+import { compileActionsFile, writeModuleDTS, resolveActionsPath, isActionsFile } from './utils';
 import { RESOLVED_VIRTUAL_MODULE_ID, VIRTUAL_MODULE_ID } from './constants';
 import type { ServerActionsOptions } from './types';
 export type * from './types';
@@ -27,6 +27,15 @@ export default function serverActions(options: ServerActionsOptions = {}): Plugi
 		},
 
 		configureServer(server) {
+			const watchDir = resolveActionsPath(root, options.actionsDir);
+			server.watcher.add(watchDir);
+
+			server.watcher.on('change', async path => {
+				if (isActionsFile(path, options.actionsDir)) {
+					compiledCode = await compileActionsFile(root, options.actionsDir);
+				}
+			});
+
 			return () => {
 				server.middlewares.use((_req, _res, next) => {
 					next();
@@ -52,6 +61,15 @@ export default function serverActions(options: ServerActionsOptions = {}): Plugi
 			// Return type declarations
 			if (id === `\0${VIRTUAL_MODULE_ID}?types`) {
 				return TYPE_DECLARATION;
+			}
+		},
+
+		handleHotUpdate({ file, server }) {
+			if (isActionsFile(file, options.actionsDir)) {
+				const mod = server.moduleGraph.getModuleById(RESOLVED_VIRTUAL_MODULE_ID);
+				if (mod) {
+					return [mod];
+				}
 			}
 		},
 

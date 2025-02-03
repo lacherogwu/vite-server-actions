@@ -2,15 +2,18 @@ import { resolve } from 'node:path';
 import fs from 'node:fs/promises';
 import { build } from 'esbuild';
 
-async function resolveActionsPath(root: string, actionsDir?: string) {
-	const _actionsDir = actionsDir || 'src/actions';
-	return resolve(root, _actionsDir, 'index.ts');
+function getActionsDir(actionsDir?: string): string {
+	return actionsDir || 'src/actions';
+}
+
+export function resolveActionsPath(root: string, actionsDir?: string) {
+	return resolve(root, getActionsDir(actionsDir), 'index.ts');
 }
 
 export async function compileActionsFile(root: string, actionsDir?: string): Promise<string> {
 	let compiledCode: string = '';
 	try {
-		const entryFile = await resolveActionsPath(root, actionsDir);
+		const entryFile = resolveActionsPath(root, actionsDir);
 		try {
 			await fs.access(entryFile);
 		} catch (e) {
@@ -52,14 +55,20 @@ export async function compileActionsFile(root: string, actionsDir?: string): Pro
 }
 
 export async function writeModuleDTS(root: string, actionsDir?: string) {
-	const entryFile = await resolveActionsPath(root, actionsDir);
+	const entryFile = resolveActionsPath(root, actionsDir);
 
 	const code = `
 declare module "vite:actions" {
 	type Actions = typeof import("${entryFile}")["default"];
-	// export * from '...'
+	export * from 'vite-server-actions/client';
 	export const actions: Actions;
 }`;
 
 	await fs.writeFile(resolve(import.meta.dirname, 'types.d.ts'), code);
+}
+
+export function isActionsFile(file: string, actionsDir?: string): boolean {
+	const normalizedActionsDir = getActionsDir(actionsDir).replace(/\\/g, '/');
+	const normalizedFile = file.replace(/\\/g, '/');
+	return normalizedFile.includes(normalizedActionsDir);
 }
