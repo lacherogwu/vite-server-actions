@@ -4,12 +4,6 @@ import { RESOLVED_VIRTUAL_MODULE_ID, VIRTUAL_MODULE_ID } from './constants';
 import type { ServerActionsOptions } from './types';
 export type * from './types';
 
-const TYPE_DECLARATION = `
-declare module 'vite:actions' {
-  export const actions: Record<string, (...args: any[]) => Promise<any>>;
-}
-`;
-
 export default function serverActions(options: ServerActionsOptions = {}): Plugin {
 	let compiledCode: string = '';
 	let root: string;
@@ -22,7 +16,7 @@ export default function serverActions(options: ServerActionsOptions = {}): Plugi
 
 		async buildStart() {
 			compiledCode = await compileActionsFile(root, options.actionsDir);
-			console.log('🚀 → buildStart → compiledCode:', compiledCode);
+			// console.log('🚀 → buildStart → compiledCode:', compiledCode);
 			await writeModuleDTS(root, options.actionsDir);
 		},
 
@@ -47,20 +41,12 @@ export default function serverActions(options: ServerActionsOptions = {}): Plugi
 			if (id === VIRTUAL_MODULE_ID) {
 				return RESOLVED_VIRTUAL_MODULE_ID;
 			}
-			// Handle type declarations
-			if (id === `${VIRTUAL_MODULE_ID}?types`) {
-				return `\0${VIRTUAL_MODULE_ID}?types`;
-			}
 		},
 
 		load(id) {
 			if (id === RESOLVED_VIRTUAL_MODULE_ID) {
-				console.log(compiledCode);
+				// console.log(compiledCode);
 				return compiledCode;
-			}
-			// Return type declarations
-			if (id === `\0${VIRTUAL_MODULE_ID}?types`) {
-				return TYPE_DECLARATION;
 			}
 		},
 
@@ -81,18 +67,12 @@ export default function serverActions(options: ServerActionsOptions = {}): Plugi
 		// },
 
 		generateBundle() {
-			this.emitFile({
-				type: 'asset',
-				fileName: 'server-actions.d.ts',
-				source: TYPE_DECLARATION,
-			});
+			// this.emitFile({
+			// 	type: 'asset',
+			// 	fileName: 'server-actions.d.ts',
+			// 	source: TYPE_DECLARATION,
+			// });
 		},
-
-		// PROD
-		// generateBundle(options, bundle) {
-		// 	// options.
-		// 	console.log(options, bundle);
-		// },
 	};
 }
 
